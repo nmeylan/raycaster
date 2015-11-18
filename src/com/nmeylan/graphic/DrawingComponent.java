@@ -22,7 +22,7 @@ public class DrawingComponent extends JPanel {
         int i = 0;
         for(Ray ray: raysToDraw){
             g.setColor(Color.RED);
-            g.drawLine((int)ray.getOrigin().getX(), - (int)ray.getOrigin().getY(), i, (int) Math.floor(ray.getHeight()));
+            g.drawLine((int)Math.floor(ray.getOrigin().getX()), (int)Math.floor(ray.getOrigin().getY()), i, (int)Math.floor(ray.getOrigin().getY()) + (int) Math.floor(ray.getHeight()));
             i++;
         }
     }

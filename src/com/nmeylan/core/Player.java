@@ -22,6 +22,7 @@ public class Player {
 
     public void move(List<KeyCodeEnum> keys, double delta) {
         for (KeyCodeEnum key : keys) {
+            printLocation();
             switch (key) {
                 case LEFT:
                     moveLeft();
@@ -43,28 +44,32 @@ public class Player {
 
     private void moveLeft() {
         this.angle += 1;
+        if (Math.abs(this.angle) == 360)
+            this.angle = 0;
     }
 
     private void moveRight() {
         this.angle -= 1;
+        if (Math.abs(this.angle) == 0)
+            this.angle = 360;
     }
 
     private void moveForward() {
-        double newX = this.getX() + Math.cos(Math.toRadians(this.angle)) * (this.isPlayerFacingLeft() ? 1 : -1);
-        double newY = this.getY() + Math.sin(Math.toRadians(this.angle)) * (this.isPlayerFacingUp() ? 1 : -1);
-        this.setX(newX);
-        this.setY(newY);
-    }
-
-    private void moveBackward() {
         double newX = this.getX() + Math.cos(Math.toRadians(this.angle)) * (this.isPlayerFacingLeft() ? -1 : 1);
         double newY = this.getY() + Math.sin(Math.toRadians(this.angle)) * (this.isPlayerFacingUp() ? -1 : 1);
         this.setX(newX);
         this.setY(newY);
     }
 
-    public void printLocation(){
-        System.out.println(String.format("x: "+getX()+", y: "+getY()+" angle:"+getAngle()));
+    private void moveBackward() {
+        double newX = this.getX() + Math.cos(Math.toRadians(this.angle)) * (this.isPlayerFacingLeft() ? 1 : -1);
+        double newY = this.getY() + Math.sin(Math.toRadians(this.angle)) * (this.isPlayerFacingUp() ? 1 : -1);
+        this.setX(newX);
+        this.setY(newY);
+    }
+
+    public void printLocation() {
+        System.out.println(String.format("x: " + getX() + ", y: " + getY() + " angle:" + getAngle()));
     }
 
     public double getX() {

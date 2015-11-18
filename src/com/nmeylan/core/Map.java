@@ -21,14 +21,13 @@ public class Map {
     private boolean isAMapElementAt(MapElementEnum mapElement, double x, double y){
         int roundedX = (int) Math.floor(x);
         int roundedY =(int) Math.floor(y);
+        int indexX = roundedX/ squareSize;
+        int indexY = roundedY/ squareSize;
 
-        if(roundedX < 0){
-            roundedX = 1;
+        if(roundedX < 0 || roundedY < 0 || indexX >= matrix.length || indexY >= matrix[0].length){
+            return true;
         }
-        if(roundedY < 0){
-            roundedY = 1;
-        }
-        return mapElement.getValue() == matrix[roundedX / squareSize][roundedY / squareSize];
+        return mapElement.getValue() == matrix[indexX][indexY];
     }
 
     public int getSquareSize() {

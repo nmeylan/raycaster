@@ -25,24 +25,24 @@ public class RayCaster {
         Set<Ray> rays = new LinkedHashSet<Ray>();
         double i = 0;
         double projectionCenterY = (getFieldOfView().getHeight() / 2);
-        double angle = player.getAngle() + getFieldOfView().getVisionAngle() / 2;
+        double angle = (player.getAngle() + getFieldOfView().getVisionAngle() / 2);
         double relativeAngle = getFieldOfView().getVisionAngle() /2;
         double rayHeight;
         while (i < getFieldOfView().getWidth()) {
             rayHeight = castSingleRay(angle, relativeAngle);
-            rays.add(new Ray(new Location(i, projectionCenterY - rayHeight),rayHeight));
+            rays.add(new Ray(new Location(i, projectionCenterY - rayHeight/2), rayHeight));
             angle -= getFieldOfView().getAngleBetweenSubSequentRays();
             relativeAngle -= getFieldOfView().getAngleBetweenSubSequentRays();
             i += 1;
         }
+
         return rays;
     }
 
     private double castSingleRay(double angle, double relativeAngle) {
-        double distanceToWall = findDistanceToWall(findHorizontalIntersection(angle), findVerticalIntersection(angle));
-        double distortedDistance = getFieldOfView().getHeight() / distanceToWall * getFieldOfView().getDistanceFromProjectionPlane();
-
-        return distortedDistance * Math.cos(Math.toRadians(relativeAngle));
+        double distortedDistanceToWall = findDistanceToWall(findHorizontalIntersection(angle), findVerticalIntersection(angle));
+        double distanceToWall = distortedDistanceToWall * Math.cos(Math.toRadians(relativeAngle));
+        return map.getSquareSize() / distanceToWall * getFieldOfView().getDistanceFromProjectionPlane();
     }
 
     /**
