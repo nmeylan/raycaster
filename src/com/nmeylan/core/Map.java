@@ -18,18 +18,26 @@ public class Map {
         return isAMapElementAt(MapElementEnum.WALL, x, y);
     }
 
-    private boolean isAMapElementAt(MapElementEnum mapElement, double x, double y){
-        int roundedX = (int) Math.floor(x);
-        int roundedY =(int) Math.floor(y);
-        int indexX = roundedX/ squareSize;
-        int indexY = roundedY/ squareSize;
-
-        if(roundedX < 0 || roundedY < 0 || indexX >= matrix.length || indexY >= matrix[0].length){
-            return true;
-        }
-        return mapElement.getValue() == matrix[indexX][indexY];
+    public boolean isCoordinateOutOfBounds(double x, double y){
+        int indexX = valueToIndex(x);
+        int indexY = valueToIndex(y);
+        return isIndexOutOfBounds(indexX, indexY);
     }
 
+    public boolean isIndexOutOfBounds(int indexX, int indexY){
+        return indexX < 0 || indexY < 0 || indexY >= matrix.length || indexX >= matrix[0].length;
+    }
+
+    private boolean isAMapElementAt(MapElementEnum mapElement, double x, double y){
+        int indexX = valueToIndex(x);
+        int indexY = valueToIndex(y);
+        return mapElement.getValue() == matrix[indexY][indexX];
+    }
+
+    private int valueToIndex(double value){
+        int roundedValue = (int) Math.floor(value);
+        return roundedValue/ squareSize;
+    }
     public int getSquareSize() {
         return squareSize;
     }

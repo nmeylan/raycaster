@@ -22,7 +22,6 @@ public class Player {
 
     public void move(List<KeyCodeEnum> keys, double delta) {
         for (KeyCodeEnum key : keys) {
-            printLocation();
             switch (key) {
                 case LEFT:
                     moveLeft();

@@ -12,7 +12,6 @@ import com.nmeylan.graphic.DrawingComponent;
 import com.nmeylan.graphic.RayCasterLoop;
 import com.nmeylan.util.Location;
 
-import javax.swing.*;
 
 public class Main {
 

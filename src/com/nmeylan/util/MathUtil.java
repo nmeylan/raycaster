@@ -1,0 +1,16 @@
+package com.nmeylan.util;
+
+/**
+ * Created by Nicolas on 18/11/2015.
+ */
+public class MathUtil {
+    /**
+     * This method set angle into bound (0-360)
+     *
+     * @param angle: an angle in degree.
+     * @return the angle in 2kPI
+     */
+    public static double boundAngle(double angle) {
+        return angle % 360;
+    }
+}
