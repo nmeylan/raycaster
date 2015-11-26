@@ -9,7 +9,8 @@ import java.util.List;
  * Created by Nicolas on 08/11/2015.
  */
 public class Player {
-
+    private static final double ROTATION_RATIO = 2;
+    private static final double SPEED_RATIO = 2;
     private Location location;
     private double angle;
     private FieldOfView fieldOfView;
@@ -22,6 +23,7 @@ public class Player {
 
     public void move(List<KeyCodeEnum> keys, double delta) {
         for (KeyCodeEnum key : keys) {
+            printLocation();
             switch (key) {
                 case LEFT:
                     moveLeft();
@@ -42,27 +44,27 @@ public class Player {
     }
 
     private void moveLeft() {
-        this.angle += 1;
+        this.angle += 1 * ROTATION_RATIO;
         if (Math.abs(this.angle) == 360)
             this.angle = 0;
     }
 
     private void moveRight() {
-        this.angle -= 1;
+        this.angle -= 1 * ROTATION_RATIO;
         if (Math.abs(this.angle) == 0)
             this.angle = 360;
     }
 
     private void moveForward() {
-        double newX = this.getX() + Math.cos(Math.toRadians(this.angle)) * (this.isPlayerFacingLeft() ? -1 : 1);
-        double newY = this.getY() + Math.sin(Math.toRadians(this.angle)) * (this.isPlayerFacingUp() ? -1 : 1);
+        double newX = this.getX() + Math.cos(Math.toRadians(this.angle)) * ((this.isPlayerFacingLeft() ? -1 : 1) * SPEED_RATIO);
+        double newY = this.getY() + Math.sin(Math.toRadians(this.angle)) * ((this.isPlayerFacingUp() ? -1 : 1) * SPEED_RATIO);
         this.setX(newX);
         this.setY(newY);
     }
 
     private void moveBackward() {
-        double newX = this.getX() + Math.cos(Math.toRadians(this.angle)) * (this.isPlayerFacingLeft() ? 1 : -1);
-        double newY = this.getY() + Math.sin(Math.toRadians(this.angle)) * (this.isPlayerFacingUp() ? 1 : -1);
+        double newX = this.getX() + Math.cos(Math.toRadians(this.angle)) * ((this.isPlayerFacingLeft() ? 1 : -1) * SPEED_RATIO);
+        double newY = this.getY() + Math.sin(Math.toRadians(this.angle)) * ((this.isPlayerFacingUp() ? 1 : -1) * SPEED_RATIO);
         this.setX(newX);
         this.setY(newY);
     }
