@@ -4,6 +4,7 @@ import com.nmeylan.graphic.Ray;
 import com.nmeylan.util.Location;
 import com.nmeylan.util.MathUtil;
 
+import java.awt.*;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -24,13 +25,10 @@ public class RayCaster {
     public Set<Ray> cast() {
         Set<Ray> rays = new LinkedHashSet<Ray>();
         double i = 0;
-        double projectionCenterY = (getFieldOfView().getHeight() / 2);
         double angle = (player.getAngle() + getFieldOfView().getVisionAngle() / 2);
         double relativeAngle = getFieldOfView().getVisionAngle() / 2;
-        double rayHeight;
         while (i < getFieldOfView().getWidth()) {
-            rayHeight = castSingleRay(angle, relativeAngle);
-            rays.add(new Ray(new Location(i, projectionCenterY - rayHeight / 2), rayHeight));
+            rays.add(castSingleRay(MathUtil.boundAngle(angle), relativeAngle, i));
             angle -= getFieldOfView().getAngleBetweenSubSequentRays();
             relativeAngle -= getFieldOfView().getAngleBetweenSubSequentRays();
             i += 1;
@@ -39,20 +37,25 @@ public class RayCaster {
         return rays;
     }
 
-    private double castSingleRay(double angle, double relativeAngle) {
-        double distortedDistanceToWall = findDistanceToWall(findHorizontalIntersection(MathUtil.boundAngle(angle)), findVerticalIntersection(MathUtil.boundAngle(angle)));
+    private Ray castSingleRay(double angle, double relativeAngle, double rayXCoordinate) {
+        Location horizontalIntersection = findHorizontalIntersection(angle);
+        Location verticalIntersection = findVerticalIntersection(angle);
+        double distortedDistanceToWall;
+        double distanceA = player.getLocation().distanceTo(horizontalIntersection);
+        double distanceB = player.getLocation().distanceTo(verticalIntersection);
+        Color color;
+        if (distanceA < distanceB){
+            distortedDistanceToWall = distanceA;
+            color = Color.gray;
+        }
+        else{
+            distortedDistanceToWall = distanceB;
+            color = Color.darkGray;
+        }
         double distanceToWall = distortedDistanceToWall * Math.cos(Math.toRadians(relativeAngle));
-        return map.getSquareSize() / distanceToWall * getFieldOfView().getDistanceFromProjectionPlane();
-    }
-
-    /**
-     * Find distance to Wall.
-     */
-
-    private double findDistanceToWall(Location locationA, Location locationB) {
-        double distanceA = player.getLocation().distanceTo(locationA);
-        double distanceB = player.getLocation().distanceTo(locationB);
-        return distanceA < distanceB ? distanceA : distanceB;
+        double rayHeight = map.getSquareSize() / distanceToWall * getFieldOfView().getDistanceFromProjectionPlane();
+        double projectionCenterY = (getFieldOfView().getHeight() / 2);
+        return new Ray(new Location(rayXCoordinate, projectionCenterY - rayHeight / 2), rayHeight, color);
     }
 
     /**
@@ -61,63 +64,53 @@ public class RayCaster {
 
 
     private Location findHorizontalIntersection(double angle) {
+        if (angle == 0 || angle == 180) {
+            return new Location(Double.MAX_VALUE, Double.MAX_VALUE);
+        }
         double intersectionX, intersectionY, ya, xa;
-        boolean outOfBounds = false;
         intersectionY = Math.floor(player.getY() / map.getSquareSize()) * map.getSquareSize();
         intersectionY += isRayFacingUp(angle) ? -1 : map.getSquareSize();
-        intersectionX = player.getX() + (player.getY() - intersectionY) / Math.tan(Math.toRadians(angle));
+        intersectionX = player.getX() + (intersectionY - player.getY()) / Math.tan(Math.toRadians(angle));
 
-        if (map.isCoordinateOutOfBounds(intersectionX, intersectionY)) {
-            return new Location(Double.MAX_VALUE, Double.MAX_VALUE);
-        }
-
-        while (!outOfBounds && !map.isAWallAt(intersectionX, intersectionY)) {
-            ya = isRayFacingUp(angle) ? -map.getSquareSize() : map.getSquareSize();
-            xa = map.getSquareSize() / Math.tan(Math.toRadians(angle));
-
-            intersectionX += xa;
-            intersectionY += ya;
-            outOfBounds = map.isCoordinateOutOfBounds(intersectionX, intersectionY);
-        }
-        if (outOfBounds) {
-            return new Location(Double.MAX_VALUE, Double.MAX_VALUE);
-        }else{
-            return new Location(intersectionX, intersectionY);
-        }
+        ya = isRayFacingUp(angle) ? -map.getSquareSize() : map.getSquareSize();
+        xa = map.getSquareSize() / Math.tan(Math.toRadians(angle));
+        return findIntersection(intersectionX, intersectionY, ya, xa);
     }
 
     private Location findVerticalIntersection(double angle) {
-        double intersectionX, intersectionY, ya, xa;
-        boolean outOfBounds = false;
-        intersectionX = Math.floor(player.getX() / map.getSquareSize()) * map.getSquareSize();
-        intersectionX += isRayFacingLeft(angle) ? -1 : map.getSquareSize();
-        intersectionY = player.getY() + (player.getX() - intersectionX) * Math.tan(Math.toRadians(angle));
-
-        if (map.isCoordinateOutOfBounds(intersectionX, intersectionY)) {
+        if (angle == 90 || angle == 270) {
             return new Location(Double.MAX_VALUE, Double.MAX_VALUE);
         }
+        double intersectionX, intersectionY, ya, xa;
+        intersectionX = Math.floor(player.getX() / map.getSquareSize()) * map.getSquareSize();
+        intersectionX += isRayFacingLeft(angle) ? -1 : map.getSquareSize();
+        intersectionY = player.getY() + (intersectionX - player.getX()) * Math.tan(Math.toRadians(angle));
 
+        xa = isRayFacingLeft(angle) ? -map.getSquareSize() : map.getSquareSize();
+        ya = map.getSquareSize() * Math.tan(Math.toRadians(angle));
+        return findIntersection(intersectionX, intersectionY, ya, xa);
+    }
+
+    private Location findIntersection(double intersectionX, double intersectionY, double ya, double xa) {
+        boolean outOfBounds = map.isCoordinateOutOfBounds(intersectionX, intersectionY);
         while (!outOfBounds && !map.isAWallAt(intersectionX, intersectionY)) {
-            xa = isRayFacingLeft(angle) ? -map.getSquareSize() : map.getSquareSize();
-            ya = map.getSquareSize() * Math.tan(Math.toRadians(angle));
-
             intersectionX += xa;
             intersectionY += ya;
             outOfBounds = map.isCoordinateOutOfBounds(intersectionX, intersectionY);
         }
         if (outOfBounds) {
             return new Location(Double.MAX_VALUE, Double.MAX_VALUE);
-        }else{
+        } else {
             return new Location(intersectionX, intersectionY);
         }
     }
 
     private boolean isRayFacingUp(double angle) {
-        return angle <= 180;
+        return angle > 0 && angle < 180;
     }
 
     private boolean isRayFacingLeft(double angle) {
-        return angle > 90 && angle <= 270;
+        return angle >= 90 && angle < 270;
     }
 
 

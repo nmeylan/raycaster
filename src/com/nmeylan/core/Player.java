@@ -45,14 +45,14 @@ public class Player {
 
     private void moveLeft() {
         this.angle += 1 * ROTATION_RATIO;
-        if (Math.abs(this.angle) == 360)
-            this.angle = 0;
+        if (this.angle >= 360)
+            this.angle -= 360;
     }
 
     private void moveRight() {
         this.angle -= 1 * ROTATION_RATIO;
-        if (Math.abs(this.angle) == 0)
-            this.angle = 360;
+        if (this.angle < 0)
+            this.angle += 360;
     }
 
     private void moveForward() {

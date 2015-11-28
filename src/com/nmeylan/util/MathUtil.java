@@ -11,6 +11,10 @@ public class MathUtil {
      * @return the angle in 2kPI
      */
     public static double boundAngle(double angle) {
-        return angle % 360;
+        if (angle < 0)
+            angle += 360;
+        else if (angle >= 360)
+            angle -= 360;
+        return angle;
     }
 }
