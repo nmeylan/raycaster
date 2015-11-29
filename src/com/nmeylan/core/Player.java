@@ -56,15 +56,15 @@ public class Player {
     }
 
     private void moveForward() {
-        double newX = this.getX() + Math.cos(Math.toRadians(this.angle)) * ((this.isPlayerFacingLeft() ? -1 : 1) * SPEED_RATIO);
-        double newY = this.getY() + Math.sin(Math.toRadians(this.angle)) * ((this.isPlayerFacingUp() ? -1 : 1) * SPEED_RATIO);
+        double newX = this.getX() + Math.cos(Math.toRadians(this.angle)) * (1 * SPEED_RATIO);
+        double newY = this.getY() + Math.sin(Math.toRadians(this.angle)) * (-1 * SPEED_RATIO);
         this.setX(newX);
         this.setY(newY);
     }
 
     private void moveBackward() {
-        double newX = this.getX() + Math.cos(Math.toRadians(this.angle)) * ((this.isPlayerFacingLeft() ? 1 : -1) * SPEED_RATIO);
-        double newY = this.getY() + Math.sin(Math.toRadians(this.angle)) * ((this.isPlayerFacingUp() ? 1 : -1) * SPEED_RATIO);
+        double newX = this.getX() + Math.cos(Math.toRadians(this.angle)) * (-1 * SPEED_RATIO);
+        double newY = this.getY() + Math.sin(Math.toRadians(this.angle)) * (1 * SPEED_RATIO);
         this.setX(newX);
         this.setY(newY);
     }
@@ -94,7 +94,7 @@ public class Player {
     }
 
     private boolean isPlayerFacingUp() {
-        return angle <= 180;
+        return angle >= 0 && angle < 180;
     }
 
     private boolean isPlayerFacingLeft() {
