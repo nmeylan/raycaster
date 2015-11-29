@@ -16,10 +16,12 @@ import java.util.Set;
 public class RayCaster {
     private Player player;
     private Map map;
+    private int flagLatestIntersectionType;
 
     public RayCaster(Player player, Map map) {
         this.player = player;
         this.map = map;
+        this.flagLatestIntersectionType = 0;
     }
 
     public Set<Ray> cast() {
@@ -41,15 +43,25 @@ public class RayCaster {
         Location horizontalIntersection = findHorizontalIntersection(angle);
         Location verticalIntersection = findVerticalIntersection(angle);
         double distortedDistanceToWall;
-        double distanceA = player.getLocation().distanceTo(horizontalIntersection);
-        double distanceB = player.getLocation().distanceTo(verticalIntersection);
+        double distanceA = Math.round(player.getLocation().distanceTo(horizontalIntersection));
+        double distanceB = Math.round(player.getLocation().distanceTo(verticalIntersection));
         Color color;
+        // this avoid "noise" when distance difference is too "small".
+        if(distanceA - distanceB < 2){
+            if(flagLatestIntersectionType == 0){
+                distanceB +=2;
+            }else{
+                distanceA +=2;
+            }
+        }
         if (distanceA < distanceB) {
             distortedDistanceToWall = distanceA;
             color = Color.gray;
+            flagLatestIntersectionType = 0;
         } else {
             distortedDistanceToWall = distanceB;
             color = Color.darkGray;
+            flagLatestIntersectionType = 1;
         }
         double distanceToWall = distortedDistanceToWall * Math.cos(Math.toRadians(relativeAngle));
         double rayHeight = map.getSquareSize() / distanceToWall * getFieldOfView().getDistanceFromProjectionPlane();
@@ -100,7 +112,7 @@ public class RayCaster {
         if (outOfBounds) {
             return new Location(Double.MAX_VALUE, Double.MAX_VALUE);
         } else {
-            return new Location(intersectionX, intersectionY);
+            return new Location(Math.floor(intersectionX), Math.floor(intersectionY));
         }
     }
 
@@ -116,7 +128,7 @@ public class RayCaster {
         double xa;
         xa = map.getSquareSize() / Math.tan(Math.toRadians(angle));
         if ((isRayFacingLeft(angle) && xa > 0) || (!isRayFacingLeft(angle) && xa < 0)) {
-                xa = -xa;
+            xa = -xa;
         }
         return xa;
     }
@@ -125,7 +137,7 @@ public class RayCaster {
         double ya;
         ya = map.getSquareSize() * Math.tan(Math.toRadians(angle));
         if ((isRayFacingUp(angle) && ya > 0) || (!isRayFacingUp(angle) && ya < 0)) {
-               ya = -ya;
+            ya = -ya;
         }
         return ya;
     }
