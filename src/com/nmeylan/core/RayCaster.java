@@ -44,11 +44,10 @@ public class RayCaster {
         double distanceA = player.getLocation().distanceTo(horizontalIntersection);
         double distanceB = player.getLocation().distanceTo(verticalIntersection);
         Color color;
-        if (distanceA < distanceB){
+        if (distanceA < distanceB) {
             distortedDistanceToWall = distanceA;
             color = Color.gray;
-        }
-        else{
+        } else {
             distortedDistanceToWall = distanceB;
             color = Color.darkGray;
         }
@@ -70,10 +69,10 @@ public class RayCaster {
         double intersectionX, intersectionY, ya, xa;
         intersectionY = Math.floor(player.getY() / map.getSquareSize()) * map.getSquareSize();
         intersectionY += isRayFacingUp(angle) ? -1 : map.getSquareSize();
-        intersectionX = player.getX() + (intersectionY - player.getY()) / Math.tan(Math.toRadians(angle));
+        intersectionX = player.getX() + (player.getY() - intersectionY) / Math.tan(Math.toRadians(angle));
 
         ya = isRayFacingUp(angle) ? -map.getSquareSize() : map.getSquareSize();
-        xa = map.getSquareSize() / Math.tan(Math.toRadians(angle));
+        xa = xaStep(angle);
         return findIntersection(intersectionX, intersectionY, ya, xa);
     }
 
@@ -84,10 +83,10 @@ public class RayCaster {
         double intersectionX, intersectionY, ya, xa;
         intersectionX = Math.floor(player.getX() / map.getSquareSize()) * map.getSquareSize();
         intersectionX += isRayFacingLeft(angle) ? -1 : map.getSquareSize();
-        intersectionY = player.getY() + (intersectionX - player.getX()) * Math.tan(Math.toRadians(angle));
+        intersectionY = player.getY() + (player.getX() - intersectionX) * Math.tan(Math.toRadians(angle));
 
         xa = isRayFacingLeft(angle) ? -map.getSquareSize() : map.getSquareSize();
-        ya = map.getSquareSize() * Math.tan(Math.toRadians(angle));
+        ya = yaStep(angle);
         return findIntersection(intersectionX, intersectionY, ya, xa);
     }
 
@@ -113,6 +112,23 @@ public class RayCaster {
         return angle >= 90 && angle < 270;
     }
 
+    private double xaStep(double angle) {
+        double xa;
+        xa = map.getSquareSize() / Math.tan(Math.toRadians(angle));
+        if ((isRayFacingLeft(angle) && xa > 0) || (!isRayFacingLeft(angle) && xa < 0)) {
+                xa = -xa;
+        }
+        return xa;
+    }
+
+    private double yaStep(double angle) {
+        double ya;
+        ya = map.getSquareSize() * Math.tan(Math.toRadians(angle));
+        if ((isRayFacingUp(angle) && ya > 0) || (!isRayFacingUp(angle) && ya < 0)) {
+               ya = -ya;
+        }
+        return ya;
+    }
 
     private FieldOfView getFieldOfView() {
         return player.getFieldOfView();
